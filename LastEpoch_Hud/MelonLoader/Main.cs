@@ -1,6 +1,8 @@
 ﻿using HarmonyLib;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace LastEpoch_Hud
@@ -20,7 +22,7 @@ namespace LastEpoch_Hud
         }
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
-            Scenes.SceneName = sceneName;
+            Scenes.SceneName = SceneManager.GetActiveScene().name;
         }
         public override void OnLateUpdate()
         {
@@ -73,7 +75,7 @@ namespace LastEpoch_Hud
                 {
                     if (backup == Selected.Unknow) { Main.logger_instance.Msg("Locale initialized to " + current.ToString()); }
                     else { Main.logger_instance.Msg("Locale change to " + current.ToString()); }
-                    
+
                     //Here to Update mods text
                 }
             }
@@ -91,8 +93,8 @@ namespace LastEpoch_Hud
             GameObject base_object = Object.Instantiate(new GameObject(name: base_object_name), Vector3.zero, Quaternion.identity);
             Object.DontDestroyOnLoad(base_object);
             base_object.AddComponent<Scripts.Refs_Manager>();
-            base_object.AddComponent<Scripts.Save_Manager>();           
-            base_object.AddComponent<Scripts.Hud_Manager>();          
+            base_object.AddComponent<Scripts.Save_Manager>();
+            base_object.AddComponent<Scripts.Hud_Manager>();
             base_object.AddComponent<Scripts.Mods_Manager>();
             Initialized = true;
             Initializing = false;
@@ -102,15 +104,15 @@ namespace LastEpoch_Hud
     {
         public static string SceneName = "";
         private static string[] SceneMenuNames = { "ClientSplash", "PersistentUI", "Login", "CharacterSelectScene" };
-        
+
         public static bool IsGameScene()
         {
-            if ((SceneName != "") && (!SceneMenuNames.Contains(SceneName))) { return true; }
+            if (!string.IsNullOrWhiteSpace(SceneName) && (!SceneMenuNames.Contains(SceneName))) { return true; }
             else { return false; }
         }
         public static bool IsCharacterSelection()
         {
-            if ((SceneName != "") && (!SceneMenuNames.Contains(SceneMenuNames[3]))) { return true; }
+            if (!string.IsNullOrWhiteSpace(SceneName) && (!SceneMenuNames.Contains(SceneMenuNames[3]))) { return true; }
             else { return false; }
         }
     }
@@ -165,7 +167,7 @@ namespace LastEpoch_Hud
             return result;
         }
         public static Toggle Get_ToggleInPanel(GameObject obj, string panel_name, string obj_name)
-        {            
+        {
             Toggle result = null;
             GameObject panel = GetChild(obj, panel_name);
             if (!panel.IsNullOrDestroyed()) { result = Functions.GetChild(panel, obj_name).GetComponent<Toggle>(); }
@@ -198,7 +200,7 @@ namespace LastEpoch_Hud
                 if (!toogle.IsNullOrDestroyed())
                 {
                     result = GetChild(toogle, obj_name).GetComponent<Text>();
-                }                
+                }
             }
 
             return result;
@@ -214,7 +216,7 @@ namespace LastEpoch_Hud
 
             return result;
         }
-        public static Dropdown Get_DopboxInPanel(GameObject obj, string panel_name, string dropdown_name)
+        public static Dropdown Get_DopboxInPanel(GameObject obj, string panel_name, string dropdown_name, UnityAction<int> action)
         {
             Dropdown result = null;
             GameObject panel = GetChild(obj, panel_name);
@@ -224,6 +226,8 @@ namespace LastEpoch_Hud
                 if (!dropdown.IsNullOrDestroyed())
                 {
                     result = dropdown.GetComponent<Dropdown>();
+                    result.onValueChanged = new Dropdown.DropdownEvent();
+                    result.onValueChanged.AddListener(action);
                 }
             }
 
@@ -236,11 +240,12 @@ namespace LastEpoch_Hud
             if (!panel.IsNullOrDestroyed())
             {
                 GameObject label = GetChild(panel, "Title");
-                if (!label.IsNullOrDestroyed()) 
+                if (!label.IsNullOrDestroyed())
                 {
                     var temp = Functions.GetChild(label, obj_name);
-                    if (makeSureItsActive) temp.SetActive(true);   
-                    result = temp.GetComponent<Toggle>(); }                
+                    if (makeSureItsActive) temp.SetActive(true);
+                    result = temp.GetComponent<Toggle>();
+                }
             }
 
             return result;
@@ -269,6 +274,6 @@ namespace LastEpoch_Hud
                 return true;
             }
             else { return false; }
-        }        
+        }
     }
 }

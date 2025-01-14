@@ -837,29 +837,6 @@ namespace LastEpoch_Hud.Scripts
                     }
                 }
             }
-
-            [HarmonyPatch(typeof(Dropdown), "OnSelectItem")]
-            public class Dropdown_OnSelectItem
-            {
-                [HarmonyPostfix]
-                static void Postfix(ref Dropdown __instance, Toggle __0)
-                {
-                    if (!hud_object.IsNullOrDestroyed())
-                    {
-                        if ((hud_object.active) && (!__instance.IsNullOrDestroyed()) &&
-                            (!Refs_Manager.player_data.IsNullOrDestroyed()))
-                        {
-                            switch (__instance.name)
-                            {
-                                case "Dropdown_Character_Data_Classes": { if (!Refs_Manager.player_data.IsNullOrDestroyed()) { Refs_Manager.player_data.CharacterClass = __instance.value; } break; }
-                                case "Dropdown_Items_ForceDrop_Type": { Content.Items.ForceDrop.SelectType(); break; }
-                                case "Dropdown_Items_ForceDrop_Rarity": { Content.Items.ForceDrop.SelectRarity(); break; }
-                                case "Dropdown_Items_ForceDrop_Item": { Content.Items.ForceDrop.SelectItem(); break; }
-                            }
-                        }
-                    }
-                }
-            }
         }
         public class Events
         {
@@ -1178,7 +1155,7 @@ namespace LastEpoch_Hud.Scripts
                         GameObject character_data_content = Functions.GetViewportContent(content_obj, "Character_Data", "Character_Data_Content");
                         if (!character_data_content.IsNullOrDestroyed())
                         {
-                            Data.class_dropdown = Functions.Get_DopboxInPanel(character_data_content, "Classe", "Dropdown_Character_Data_Classes");
+                            Data.class_dropdown = Functions.Get_DopboxInPanel(character_data_content, "Classe", "Dropdown_Character_Data_Classes", new System.Action<int>((value) => { if (!Refs_Manager.player_data.IsNullOrDestroyed()) { Refs_Manager.player_data.CharacterClass = value; } }));
                             
                             Data.died_toggle = Functions.Get_ToggleInPanel(character_data_content, "Died", "Toggle_Character_Data_Died");
                             Data.hardcore_toggle = Functions.Get_ToggleInPanel(character_data_content, "Hardcore", "Toggle_Character_Data_Hardcore");
@@ -1852,9 +1829,9 @@ namespace LastEpoch_Hud.Scripts
                         GameObject items_forcedrop_content = Functions.GetViewportContent(content_obj, "Items_Pickup", "Items_ForceDrop_Content");
                         if (!items_forcedrop_content.IsNullOrDestroyed())
                         {
-                            ForceDrop.forcedrop_type_dropdown = Functions.Get_DopboxInPanel(items_forcedrop_content, "Type", "Dropdown_Items_ForceDrop_Type");
-                            ForceDrop.forcedrop_rarity_dropdown = Functions.Get_DopboxInPanel(items_forcedrop_content, "Rarity", "Dropdown_Items_ForceDrop_Rarity");
-                            ForceDrop.forcedrop_items_dropdown = Functions.Get_DopboxInPanel(items_forcedrop_content, "Item", "Dropdown_Items_ForceDrop_Item");                            
+                            ForceDrop.forcedrop_type_dropdown = Functions.Get_DopboxInPanel(items_forcedrop_content, "Type", "Dropdown_Items_ForceDrop_Type", new System.Action<int>((_) => { Content.Items.ForceDrop.SelectType(); }));
+                            ForceDrop.forcedrop_rarity_dropdown = Functions.Get_DopboxInPanel(items_forcedrop_content, "Rarity", "Dropdown_Items_ForceDrop_Rarity", new System.Action<int>((_) => { Content.Items.ForceDrop.SelectRarity(); }));
+                            ForceDrop.forcedrop_items_dropdown = Functions.Get_DopboxInPanel(items_forcedrop_content, "Item", "Dropdown_Items_ForceDrop_Item", new System.Action<int>((_) => { Content.Items.ForceDrop.SelectItem(); }));
                             ForceDrop.forcedrop_quantity_text = Functions.Get_TextInButton(items_forcedrop_content, "Quantity", "Value");
                             ForceDrop.forcedrop_quantity_slider = Functions.Get_SliderInPanel(items_forcedrop_content, "Quantity", "Slider_Items_ForceDrop_Quantity");
                             GameObject new_obj = Functions.GetChild(content_obj, "Items_Pickup");
