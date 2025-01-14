@@ -11,7 +11,7 @@ namespace LastEpoch_Hud
         public const string company_name = "Eleventh Hour Games";
         public const string game_name = "Last Epoch";
         public const string mod_name = "LastEpoch_Hud";
-        public const string mod_version = "4.0.8-r1"; //LastEpoch 1.1.3
+        public const string mod_version = "4.1.0-r1"; //LastEpoch 1.1.7.12
         public static bool debug = true;
 
         public override void OnInitializeMelon()
@@ -169,7 +169,7 @@ namespace LastEpoch_Hud
             Toggle result = null;
             GameObject panel = GetChild(obj, panel_name);
             if (!panel.IsNullOrDestroyed()) { result = Functions.GetChild(panel, obj_name).GetComponent<Toggle>(); }
-            
+
             return result;
         }
         public static Slider Get_SliderInPanel(GameObject obj, string panel_name, string obj_name)

@@ -118,6 +118,8 @@ namespace LastEpoch_Hud.Scripts
         private static readonly System.Action<bool> Action_SetOnline = new System.Action<bool>(SetOnline);
         private static void SetOnline(bool result)
         {
+            // BUG: For some reason the game always return true in action delegates
+            result = character_select.isOnlineTabShowing;
             if (online != result)
             {
                 Main.logger_instance.Msg("Refs Manager : Online = " + result);
